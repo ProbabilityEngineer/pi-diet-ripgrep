@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ProbabilityEngineer/pi-diet-ripgrep.git"
+    "url": "git+https://github.com/ProbabilityEngineer/pi-diet-ripgrep.git"
   },
   "bugs": {
     "url": "https://github.com/ProbabilityEngineer/pi-diet-ripgrep/issues"

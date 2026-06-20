@@ -51,3 +51,7 @@ Preparing provenance-backed v0.1.1 release: workflow has id-token: write and npm
 **2026-06-20T17:23:51Z**
 
 v0.1.1 tag workflow failed with npm 404 after provenance statement generation. Adjusted repository.url to exact GitHub HTTPS URL and aligned workflow to npm trusted publishing docs; preparing v0.1.2 release.
+
+**2026-06-20T17:24:52Z**
+
+Provenance-backed publish succeeded for v0.1.2. GitHub Actions logged signed provenance statement and transparency log index 1885929426. npm latest is now 0.1.2. Normalized repository.url to git+https to avoid future warnings.
