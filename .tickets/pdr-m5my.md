@@ -35,3 +35,7 @@ Adopted richer ~103-token variant as v1: routing-aware description plus hidden a
 **2026-06-20T16:05:26Z**
 
 Renamed public-facing project from pi-diet-rg to pi-diet-ripgrep for clarity to external users. Updated README/spec/temp prefix and will rename GitHub origin.
+
+**2026-06-20T16:07:44Z**
+
+Added package.json with pi-package metadata and pi.extensions manifest, added npm trusted-publishing workflow, README install/publish docs, and enabled GitHub Issues. npm pack --dry-run succeeded.

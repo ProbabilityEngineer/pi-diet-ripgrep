@@ -1,0 +1,42 @@
+{
+  "name": "pi-diet-ripgrep",
+  "version": "0.1.0",
+  "description": "Minimal Pi extension exposing ripgrep as a first-class exact-search tool.",
+  "type": "module",
+  "main": "index.ts",
+  "files": [
+    "index.ts",
+    "README.md",
+    "spec.md"
+  ],
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "ripgrep",
+    "rg",
+    "search"
+  ],
+  "author": "ProbabilityEngineer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ProbabilityEngineer/pi-diet-ripgrep.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ProbabilityEngineer/pi-diet-ripgrep/issues"
+  },
+  "homepage": "https://github.com/ProbabilityEngineer/pi-diet-ripgrep#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
