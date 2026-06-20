@@ -1,5 +1,7 @@
 # pi-diet-ripgrep
 
+> One of my diet context engineering and workflow extensions. Add pi-diet-LSP, pi-diet-Ripgrep, pi-repo-move and others from [npm](https://www.npmjs.com/~probabilityengineer).
+
 A minimal Pi extension that exposes ripgrep as a first-class exact-search tool.
 
 ## Files
