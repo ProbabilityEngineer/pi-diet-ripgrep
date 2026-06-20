@@ -43,3 +43,7 @@ Added package.json with pi-package metadata and pi.extensions manifest, added np
 **2026-06-20T16:14:54Z**
 
 Published package exists as pi-diet-ripgrep@0.1.0. Verified CLI setup command: npm trust github pi-diet-ripgrep --repo ProbabilityEngineer/pi-diet-ripgrep --file npm-publish.yml --allow-publish. Updated README; npm requires browser 2FA approval when run.
+
+**2026-06-20T17:22:06Z**
+
+Preparing provenance-backed v0.1.1 release: workflow has id-token: write and npm publish --provenance; bumped package.json to 0.1.1 before tag publish.
