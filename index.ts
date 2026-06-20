@@ -79,7 +79,7 @@ const rgTool = defineTool({
     if (details.truncated || truncation.truncated) {
       details.truncated = true;
       details.truncation = truncation;
-      const tempDir = await mkdtemp(join(tmpdir(), "pi-diet-rg-"));
+      const tempDir = await mkdtemp(join(tmpdir(), "pi-diet-ripgrep-"));
       const tempFile = join(tempDir, "output.txt");
       await withFileMutationQueue(tempFile, async () => {
         await writeFile(tempFile, fullText, "utf8");

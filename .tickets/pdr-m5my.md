@@ -9,7 +9,7 @@ priority: 2
 assignee: Samuel Collins
 tags: [spec, extension, rg, pi-diet]
 ---
-# Draft spec for minimal pi-diet-rg extension
+# Draft spec for minimal pi-diet-ripgrep extension
 
 Define a compact first-class ripgrep tool extension for Pi with minimal prompt footprint and structured exact-text search output.
 
@@ -31,3 +31,7 @@ Implemented initial extension in index.ts and added a prompt-footprint estimator
 **2026-06-20T15:43:17Z**
 
 Adopted richer ~103-token variant as v1: routing-aware description plus hidden and fixedStrings parameters. Updated index.ts and spec.md; estimator confirms richer variant approx 103 tokens.
+
+**2026-06-20T16:05:26Z**
+
+Renamed public-facing project from pi-diet-rg to pi-diet-ripgrep for clarity to external users. Updated README/spec/temp prefix and will rename GitHub origin.

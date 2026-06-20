@@ -1,8 +1,8 @@
-# pi-diet-rg spec
+# pi-diet-ripgrep spec
 
 ## Summary
 
-`pi-diet-rg` is a minimal Pi extension that exposes ripgrep as a first-class tool for exact text and regex search with a small prompt footprint.
+`pi-diet-ripgrep` is a minimal Pi extension that exposes ripgrep as a first-class tool for exact text and regex search with a small prompt footprint.
 
 The extension is intentionally "diet": it should add as little system-prompt overhead as possible while still being useful enough to prefer over raw `bash "rg ..."` for common literal-search workflows.
 
