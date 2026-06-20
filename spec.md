@@ -72,9 +72,9 @@ Keep the schema compact. Initial proposal:
 - `context?: number` — surrounding lines
 - `maxMatches?: number` — hard cap on returned matches
 
-Optional future additions only if needed:
-- `hidden?: boolean`
-- `fixedStrings?: boolean`
+Included in v1 because the prompt cost is acceptable:
+- `hidden?: boolean` — include hidden files when explicitly requested
+- `fixedStrings?: boolean` — treat query as a literal string instead of regex
 
 ## Output
 
@@ -163,9 +163,10 @@ That usage is common enough to justify a small first-class tool, but not a verbo
 
 ## Recommended v1
 
-Build the smallest useful version:
+Build the richer-but-still-diet version:
 - `rg` tool only
-- compact schema
+- compact schema with `hidden` and `fixedStrings`
+- routing-aware description that defers to LSP/AST/Semble
 - `rg --json`
 - structured matches
 - small default result cap

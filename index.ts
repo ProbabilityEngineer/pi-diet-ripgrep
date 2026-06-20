@@ -20,7 +20,7 @@ const execFile = promisify(execFileCallback);
 const rgTool = defineTool({
   name: "rg",
   label: "ripgrep",
-  description: "Exact text/regex search with ripgrep. Use for literal search, not semantic or structural discovery.",
+  description: "Exact text/regex search with ripgrep. Use for literal verification, logs, config keys, TODOs, and message lookup. Prefer LSP/AST/Semble for symbol, structural, or semantic discovery.",
   parameters: Type.Object({
     query: Type.String({ description: "Pattern" }),
     paths: Type.Optional(Type.Array(Type.String({ description: "Path" }))),
@@ -29,6 +29,8 @@ const rgTool = defineTool({
     word: Type.Optional(Type.Boolean({ description: "Word match" })),
     context: Type.Optional(Type.Integer({ minimum: 0, description: "Context lines" })),
     maxMatches: Type.Optional(Type.Integer({ minimum: 1, maximum: 200, description: "Match cap" })),
+    hidden: Type.Optional(Type.Boolean({ description: "Search hidden files" })),
+    fixedStrings: Type.Optional(Type.Boolean({ description: "Literal strings" })),
   }),
 
   async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
@@ -110,6 +112,8 @@ function buildArgs(params: {
   caseSensitive?: boolean;
   word?: boolean;
   context?: number;
+  hidden?: boolean;
+  fixedStrings?: boolean;
 }) {
   const args = ["--json", "--color=never", "--line-number", "--column"];
   if (params.caseSensitive) {
@@ -118,6 +122,8 @@ function buildArgs(params: {
     args.push("--smart-case");
   }
   if (params.word) args.push("-w");
+  if (params.hidden) args.push("--hidden");
+  if (params.fixedStrings) args.push("--fixed-strings");
   if (typeof params.context === "number") args.push("-C", String(params.context));
   for (const glob of params.glob ?? []) args.push("--glob", glob);
   return args;
