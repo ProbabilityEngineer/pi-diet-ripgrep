@@ -23,3 +23,7 @@ Initialized local git/jj repo, turnlog, and tickets. Drafted initial spec in spe
 **2026-06-20T14:47:16Z**
 
 Created public GitHub repository ProbabilityEngineer/pi-diet-rg and configured origin. Updated .gitignore to ignore .DS_Store and finalized initial spec draft in spec.md.
+
+**2026-06-20T15:03:22Z**
+
+Implemented initial extension in index.ts and added a prompt-footprint estimator script. Rough compact JSON estimates: current variant ~71 tokens, tighter variant ~44, richer variant ~103 (chars/4 approximation).
