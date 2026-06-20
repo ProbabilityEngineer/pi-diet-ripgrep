@@ -39,3 +39,7 @@ Renamed public-facing project from pi-diet-rg to pi-diet-ripgrep for clarity to 
 **2026-06-20T16:07:44Z**
 
 Added package.json with pi-package metadata and pi.extensions manifest, added npm trusted-publishing workflow, README install/publish docs, and enabled GitHub Issues. npm pack --dry-run succeeded.
+
+**2026-06-20T16:14:54Z**
+
+Published package exists as pi-diet-ripgrep@0.1.0. Verified CLI setup command: npm trust github pi-diet-ripgrep --repo ProbabilityEngineer/pi-diet-ripgrep --file npm-publish.yml --allow-publish. Updated README; npm requires browser 2FA approval when run.

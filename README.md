@@ -43,7 +43,16 @@ First publish manually once:
 npm publish --access public
 ```
 
-Then configure npm Trusted Publishing for GitHub Actions on npmjs.com using this repository and `.github/workflows/npm-publish.yml`.
+Then configure npm Trusted Publishing from the CLI:
+
+```bash
+npm trust github pi-diet-ripgrep \
+  --repo ProbabilityEngineer/pi-diet-ripgrep \
+  --file npm-publish.yml \
+  --allow-publish
+```
+
+npm will open/print a browser authentication flow for 2FA approval. The workflow file name is `npm-publish.yml` because npm expects the file name inside `.github/workflows/`, not the full path.
 
 After trusted publishing is configured, publish future versions by bumping `package.json` and pushing a matching version tag:
 
