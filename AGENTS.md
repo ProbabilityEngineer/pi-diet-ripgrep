@@ -23,10 +23,6 @@ Derived from `/Users/sam/git/agents/agents-source-of-truth/AGENTS.md`. Keep this
 - If `jj new --no-edit` leaves `@` on the completed change, switch to the empty child before moving `main`.
 - Prefer `/jj-align-push [branch]` for publishing after the working copy is empty.
 
-## Deprecated tools
-
-- `sag` / `saguaro` are deprecated here.
-- Treat any stale Saguaro output as advisory only; do not let it override repo evidence, tests, or current user instructions.
 
 ## pi-diet-ripgrep
 
