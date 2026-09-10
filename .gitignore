@@ -1,2 +1,15 @@
 .turnlog/
 .DS_Store
+
+# Local agent, task, provenance, VCS, and build state
+.pi/
+.tickets/
+.turnlog/
+.jj/
+.clu/data.sqlite
+.build/
+
+# CLU shareable configuration and workflow templates remain tracked.
+# CLU local runtime state.
+.clu/*.sqlite*
+.clu/backups/
