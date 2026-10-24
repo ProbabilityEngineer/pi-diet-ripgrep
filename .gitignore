@@ -8,6 +8,8 @@
 .jj/
 .clu/data.sqlite
 .build/
+node_modules/
+dist/
 
 # CLU shareable configuration and workflow templates remain tracked.
 # CLU local runtime state.

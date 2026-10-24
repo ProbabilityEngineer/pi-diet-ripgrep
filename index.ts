@@ -20,7 +20,7 @@ const execFile = promisify(execFileCallback);
 const rgTool = defineTool({
   name: "rg",
   label: "ripgrep",
-  description: "Exact text/regex search with ripgrep. Use for literal verification, logs, config keys, TODOs, and message lookup. Prefer LSP/AST/Semble for symbol, structural, or semantic discovery.",
+  description: "Exact text/regex search with ripgrep. Use for literal verification, logs, config keys, TODOs, and message lookup. Text matches alone do not establish symbol identity, code structure, or behavior.",
   parameters: Type.Object({
     query: Type.String({ description: "Pattern" }),
     paths: Type.Optional(Type.Array(Type.String({ description: "Path" }))),
@@ -40,7 +40,7 @@ const rgTool = defineTool({
 
     let stdout = "";
     try {
-      const result = await execFile("rg", [...args, params.query, ...searchPaths], {
+      const result = await execFile("rg", [...args, "--", params.query, ...searchPaths], {
         cwd: ctx.cwd,
         encoding: "utf8",
         maxBuffer: 100 * 1024 * 1024,
@@ -69,8 +69,7 @@ const rgTool = defineTool({
       };
     }
 
-    const fullText = parsed.lines.join("\n");
-    const truncation = truncateHead(fullText, {
+    const truncation = truncateHead(parsed.lines.join("\n"), {
       maxLines: DEFAULT_MAX_LINES,
       maxBytes: DEFAULT_MAX_BYTES,
     });
@@ -82,7 +81,7 @@ const rgTool = defineTool({
       const tempDir = await mkdtemp(join(tmpdir(), "pi-diet-ripgrep-"));
       const tempFile = join(tempDir, "output.txt");
       await withFileMutationQueue(tempFile, async () => {
-        await writeFile(tempFile, fullText, "utf8");
+        await writeFile(tempFile, parsed.fullLines.join("\n"), "utf8");
       });
       details.fullOutputPath = tempFile;
       const omittedMatches = Math.max(0, parsed.totalMatchCount - parsed.matches.length);
@@ -148,6 +147,7 @@ type RgDetails = {
 
 function parseRgJson(stdout: string, maxMatches: number) {
   const lines: string[] = [];
+  const fullLines: string[] = [];
   const matches: RgMatch[] = [];
   let totalMatchCount = 0;
 
@@ -166,6 +166,7 @@ function parseRgJson(stdout: string, maxMatches: number) {
       const line = record.data?.line_number ?? 0;
       const text = String(record.data?.lines?.text ?? "").replace(/\n$/, "");
       const column = (record.data?.submatches?.[0]?.start ?? 0) + 1;
+      fullLines.push(`${path}:${line}:${column}:${text}`);
       if (matches.length < maxMatches) {
         matches.push({ path, line, column, text });
         lines.push(`${path}:${line}:${column}:${text}`);
@@ -173,13 +174,15 @@ function parseRgJson(stdout: string, maxMatches: number) {
       continue;
     }
 
-    if (record.type === "context" && matches.length > 0) {
+    if (record.type === "context") {
       const path = record.data?.path?.text ?? "<unknown>";
       const line = record.data?.line_number ?? 0;
       const text = String(record.data?.lines?.text ?? "").replace(/\n$/, "");
-      lines.push(`${path}-${line}- ${text}`);
+      const formatted = `${path}-${line}- ${text}`;
+      fullLines.push(formatted);
+      if (totalMatchCount <= maxMatches) lines.push(formatted);
     }
   }
 
-  return { lines, matches, totalMatchCount };
+  return { lines, fullLines, matches, totalMatchCount };
 }

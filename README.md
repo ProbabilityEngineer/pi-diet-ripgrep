@@ -37,6 +37,28 @@ mkdir -p ~/.pi/agent/extensions/pi-diet-ripgrep
 ln -sf /path/to/pi-diet-ripgrep/index.ts ~/.pi/agent/extensions/pi-diet-ripgrep/index.ts
 ```
 
+## Development and validation
+
+Install a current Node.js release and `rg` (ripgrep), then run:
+
+```bash
+npm ci
+npm run lint
+npm run build
+npm test
+npm pack --dry-run
+```
+
+`lint` performs strict TypeScript checking of the extension and tests. `build`
+optionally compiles the extension to ignored `dist/` output; Pi and the published
+package continue to load `index.ts` directly.
+
+Tests require a POSIX environment (macOS or Linux). They exercise the registered
+tool with controlled subprocess fixtures plus a real `rg` integration test.
+Coverage includes arguments and leading-dash patterns, formatting and context,
+no matches, invalid regexes, missing executables, match/byte/line limits, complete
+saved output, and self-contained tool guidance.
+
 ## Publishing
 
 First publish manually once:
@@ -67,4 +89,4 @@ git push && git push origin v0.1.1
 
 ## Tool
 
-`rg` is intended for exact text and regex search only.
+`rg` is intended for exact text and regex search: literal verification, logs, config keys, TODOs, and message lookup. Text matches alone do not establish symbol identity, code structure, or behavior. Its guidance does not assume other extensions are installed.

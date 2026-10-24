@@ -8,11 +8,7 @@ The extension is intentionally "diet": it should add as little system-prompt ove
 
 ## Problem
 
-Pi already supports:
-- LSP for symbol-aware navigation
-- AST tools for structural search
-- Semble for semantic discovery
-- `bash` for ad hoc `rg`
+Pi supports `bash` for ad hoc `rg`, but additional code-intelligence extensions are optional and must not be assumed to be installed.
 
 What is missing is a compact, structured, exact-text search tool that:
 - is cheaper and safer than freeform shell use
@@ -26,11 +22,11 @@ What is missing is a compact, structured, exact-text search tool that:
 2. Keep added prompt footprint to roughly 100-200 tokens, ideally under 200.
 3. Return concise structured output suitable for agent use.
 4. Bound output size and support truncation safely.
-5. Avoid duplicating guidance already covered by Pi's built-in search/routing instructions.
+5. Keep guidance self-contained: describe this tool's purpose and limits without recommending other extensions.
 
 ## Non-goals
 
-- Replacing LSP, AST, or semantic tools.
+- Providing symbol-aware navigation, structural matching, or semantic discovery.
 - Becoming a full grep UI.
 - Supporting every ripgrep flag.
 - Adding large prompt instructions, examples, or verbose routing prose.
@@ -41,7 +37,7 @@ Use `rg` when the task needs:
 - exact literals
 - regex search
 - finding strings, log messages, config keys, TODOs, identifiers by text
-- quick scoped verification after semantic/AST discovery
+- quick scoped verification of candidate source locations
 
 Do not prefer `rg` for:
 - definitions/references/types
@@ -166,7 +162,7 @@ That usage is common enough to justify a small first-class tool, but not a verbo
 Build the richer-but-still-diet version:
 - `rg` tool only
 - compact schema with `hidden` and `fixedStrings`
-- routing-aware description that defers to LSP/AST/Semble
+- self-contained description covering exact-search use cases and the limits of text matches
 - `rg --json`
 - structured matches
 - small default result cap

@@ -4,6 +4,11 @@
   "description": "Minimal Pi extension exposing ripgrep as a first-class exact-search tool.",
   "type": "module",
   "main": "index.ts",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "build": "tsc --project tsconfig.build.json",
+    "test": "tsx --test tests/*.test.ts"
+  },
   "files": [
     "index.ts",
     "README.md",
@@ -38,5 +43,12 @@
     "extensions": [
       "./index.ts"
     ]
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "^1.4.0",
+    "@earendil-works/pi-coding-agent": "^1.4.0",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }
