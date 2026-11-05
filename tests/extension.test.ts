@@ -141,7 +141,7 @@ test("missing rg produces a useful spawn error", async () => {
 
 test("formatting retains paths, 1-based positions, and context on both sides", async () => {
   await withFakeRg([
-    '{"type":"begin"}', "not json",
+    '{"type":"begin"}',
     record(6, "before", "context"),
     record(7, "  needle", "match", 2),
     record(8, "after", "context"),
@@ -189,7 +189,9 @@ test("byte truncation saves complete output", async () => {
   const value = "needle " + "x".repeat(60_000);
   await withFakeRg(record(1, value), async () => {
     const result = await execute({ query: "needle" });
-    assert.equal(result.details.truncation.truncated, true);
+    assert.equal(result.details.shortenedLines, 1);
+    assert.match(text(result), /long lines shortened/);
+    assert.match(text(result), /needle/);
     assert.ok(text(result).length < value.length);
     assert.equal(await savedOutput(result), `src/example.ts:1:1:${value}`);
   });
@@ -221,4 +223,98 @@ test("real rg handles dash patterns, spaces in paths, context, no matches, and i
   assert.match(text(result), /a file.txt-3- after/);
   assert.equal(text(await execute({ query: "absent", paths: ["a file.txt"] })), "No matches found");
   await assert.rejects(execute({ query: "[", paths: ["a file.txt"] }), /regex parse error/);
+});
+
+test("long Unicode lines retain windows at match byte offsets, not just the line head", async () => {
+  const prefix = "🔑".repeat(15_000);
+  const value = prefix + "needle" + "終".repeat(20_000);
+  const offset = Buffer.byteLength(prefix);
+  await withFakeRg(record(9, value, "match", offset), async () => {
+    const result = await execute({ query: "needle" });
+    assert.match(text(result), /needle/);
+    assert.match(text(result), new RegExp(`match byte column ${offset + 1}`));
+    assert.equal(result.details.matches[0].column, offset + 1);
+    assert.ok(!text(result).includes("\uFFFD"));
+    assert.ok(Buffer.byteLength(JSON.stringify(result.details)) < 32_000);
+    assert.equal(result.details.truncation.content, undefined);
+    assert.equal(await savedOutput(result), `src/example.ts:9:${offset + 1}:${value}`);
+  });
+});
+
+test("multiple distant matches have separate bounded windows and explicit omissions", async () => {
+  const value = "x".repeat(10_000) + "first" + "y".repeat(10_000) + "second" + "z".repeat(10_000) + "third" + "w".repeat(10_000) + "fourth";
+  const starts = ["first", "second", "third", "fourth"].map(word => value.indexOf(word));
+  const raw = JSON.stringify({
+    type: "match", data: {
+      path: { text: "generated.html" }, line_number: 1, lines: { text: value },
+      submatches: starts.map(start => ({ start, end: start + 5 })),
+    },
+  });
+  await withFakeRg(raw, async () => {
+    const result = await execute({ query: "first|second|third|fourth" });
+    assert.match(text(result), /first/);
+    assert.match(text(result), /second/);
+    assert.match(text(result), /third/);
+    assert.match(text(result), /windows may omit other occurrences/);
+    assert.ok(Buffer.byteLength(result.details.matches[0].text) < 1_200);
+    assert.equal(await savedOutput(result), `generated.html:1:${starts[0] + 1}:${value}`);
+  });
+});
+
+test("metadata has a global byte budget even when each selected line is small", async () => {
+  const raw = Array.from({ length: 200 }, (_, i) => record(i + 1, "needle" + "x".repeat(900))).join("\n");
+  await withFakeRg(raw, async () => {
+    const result = await execute({ query: "needle", maxMatches: 200 });
+    assert.equal(result.details.matchCount, 200);
+    assert.ok(result.details.metadataOmitted > 0);
+    assert.ok(Buffer.byteLength(JSON.stringify(result.details)) < 32_000);
+    assert.match(text(result), /omitted from metadata by its byte budget/);
+    assert.equal((await savedOutput(result)).split("\n").length, 200);
+  });
+});
+
+test("malformed subprocess records are reported as incomplete and preserved raw", async () => {
+  const raw = record(1) + "\nnot json\nnull";
+  await withFakeRg(raw, async () => {
+    const result = await execute({ query: "needle" });
+    assert.equal(result.isError, true);
+    assert.equal(result.details.incomplete, true);
+    assert.match(text(result), /2 invalid JSON records/);
+    assert.equal(await readFile(result.details.rawOutputPath, "utf8"), raw);
+    await savedOutput(result);
+  });
+});
+
+test("capture exceeds the old 100 MiB buffer without losing output", async () => {
+  const bin = await mkdtemp(join(tmpdir(), "rg-stream-bin-"));
+  const oldPath = process.env.PATH;
+  const count = 7_000;
+  const chunk = record(1, "needle" + "x".repeat(16_000)) + "\n";
+  assert.ok(Buffer.byteLength(chunk) * count > 100 * 1024 * 1024);
+  await writeFile(join(bin, "rg"), `#!${process.execPath}
+const fs = require("node:fs");
+const chunk = ${JSON.stringify(chunk)};
+for (let i = 0; i < ${count}; i++) fs.writeSync(1, chunk);
+`, { mode: 0o755 });
+  process.env.PATH = bin;
+  try {
+    const result = await execute({ query: "needle", maxMatches: 1 });
+    assert.equal(result.details.matchCount, count);
+    assert.equal(result.isError, false);
+    assert.ok(Buffer.byteLength(JSON.stringify(result.details)) < 32_000);
+    // Read just the end from the saved formatted output, not 100 MiB into the test's memory.
+    const file = await import("node:fs/promises").then(fs => fs.open(result.details.fullOutputPath, "r"));
+    try {
+      const size = (await file.stat()).size;
+      assert.ok(size > 100 * 1024 * 1024);
+      const tail = Buffer.alloc(16);
+      await file.read(tail, 0, tail.length, size - tail.length);
+      assert.equal(tail.toString(), "x".repeat(16));
+    } finally { await file.close(); }
+    await rm(dirname(result.details.fullOutputPath), { recursive: true, force: true });
+  } finally {
+    if (oldPath === undefined) delete process.env.PATH;
+    else process.env.PATH = oldPath;
+    await rm(bin, { recursive: true, force: true });
+  }
 });
